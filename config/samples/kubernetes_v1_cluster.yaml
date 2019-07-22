@@ -1,0 +1,7 @@
+apiVersion: kubernetes.ov3rlord.me/v1
+kind: Cluster
+metadata:
+  name: cluster-sample
+spec:
+  # Add fields here
+  foo: bar
