@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/ganeshathirumurthi/overlord/pkg/boot"
+	"github.com/gtracer/overlord/pkg/boot"
 )
 
 

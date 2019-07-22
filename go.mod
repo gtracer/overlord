@@ -1,3 +1,3 @@
-module github.com/ganeshathirumurthi/overlord
+module github.com/gtracer/overlord
 
 go 1.12
