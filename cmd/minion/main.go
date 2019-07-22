@@ -1,7 +1,7 @@
 package main
 
 import (
-	"git.ov3rlord.me/pkg/boot"
+	"github.com/ganeshathirumurthi/overlord/pkg/boot"
 )
 
 

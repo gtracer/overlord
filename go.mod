@@ -1,3 +1,3 @@
-module github.com/GaneshaThirumurthi/overlord
+module github.com/ganeshathirumurthi/overlord
 
 go 1.12
