@@ -62,12 +62,12 @@ func CustomerRoutes() chi.Router {
 	r.Get("/", http.RedirectHandler("/dashboard", http.StatusMovedPermanently).ServeHTTP)
 
 	r.Route("/{id}", func(r chi.Router) {
+		r.Get("/", clusterStatus)
 		r.Get("/kubeconfig", kubeconfig)
-	})
-
-	r.Route("/{nodeid}", func(r chi.Router) {
-		r.Post("/", report)
-		r.Get("/", status)
+		r.Route("/{nodeid}", func(r chi.Router) {
+			r.Post("/", report)
+			r.Get("/", status)
+		})
 	})
 
 	return r
@@ -98,6 +98,10 @@ func report(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Write([]byte(master))
+}
+
+func clusterStatus(w http.ResponseWriter, r *http.Request) {
+	http.Error(w, "unimplemented", 400)
 }
 
 func status(w http.ResponseWriter, r *http.Request) {
