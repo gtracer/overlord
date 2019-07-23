@@ -26,3 +26,23 @@ rules:
   - get
   - patch
   - update
+- apiGroups:
+  - kubernetes.ov3rlord.me
+  resources:
+  - minions
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - kubernetes.ov3rlord.me
+  resources:
+  - minions/status
+  verbs:
+  - get
+  - patch
+  - update

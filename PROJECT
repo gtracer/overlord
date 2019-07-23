@@ -5,3 +5,6 @@ resources:
 - group: kubernetes
   version: v1
   kind: Cluster
+- group: kubernetes
+  version: v1
+  kind: Minion

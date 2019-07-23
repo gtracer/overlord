@@ -1,0 +1,7 @@
+apiVersion: kubernetes.ov3rlord.me/v1
+kind: Minion
+metadata:
+  name: minion-sample
+spec:
+  # Add fields here
+  foo: bar

@@ -19,36 +19,36 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// ClusterSpec defines the desired state of Cluster
-type ClusterSpec struct {
+// MinionSpec defines the desired state of Minion
+type MinionSpec struct {
 }
 
-// ClusterStatus defines the observed state of Cluster
-type ClusterStatus struct {
+// MinionStatus defines the observed state of Minion
+type MinionStatus struct {
 }
 
 // +kubebuilder:object:root=true
 // +kubebuilder:resource:path=clusters,scope=Cluster
 // +kubebuilder:subresource:status
 
-// Cluster is the Schema for the clusters API
-type Cluster struct {
+// Minion is the Schema for the minions API
+type Minion struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   ClusterSpec   `json:"spec,omitempty"`
-	Status ClusterStatus `json:"status,omitempty"`
+	Spec   MinionSpec   `json:"spec,omitempty"`
+	Status MinionStatus `json:"status,omitempty"`
 }
 
 // +kubebuilder:object:root=true
 
-// ClusterList contains a list of Cluster
-type ClusterList struct {
+// MinionList contains a list of Minion
+type MinionList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []Cluster `json:"items"`
+	Items           []Minion `json:"items"`
 }
 
 func init() {
-	SchemeBuilder.Register(&Cluster{}, &ClusterList{})
+	SchemeBuilder.Register(&Minion{}, &MinionList{})
 }
