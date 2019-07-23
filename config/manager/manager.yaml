@@ -60,6 +60,10 @@ spec:
         - /overlord
         image: quay.io/awesomenix/overlord:latest
         name: overlord
+        ports:
+        - containerPort: 8080
+          name: overlord-server
+          protocol: TCP
         resources:
           limits:
             cpu: 100m
@@ -80,6 +84,7 @@ spec:
   ports:
   - name: http
     port: 8080
-    targetPort: http
+    targetPort: overlord-server
   selector:
     control-plane: overlord
+  type: LoadBalancer

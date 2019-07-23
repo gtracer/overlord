@@ -22,7 +22,10 @@ func Report(userID, clusterName string) error {
 
 	ns := &corev1.Namespace{}
 	err = client.Get(context.TODO(), types.NamespacedName{Name: userID}, ns)
-	if err != nil && apierrors.IsNotFound(err) {
+	if err != nil {
+		if !apierrors.IsNotFound(err) {
+			return errors.Errorf("failed to get namespace %s, %v", userID, err)
+		}
 		ns = &corev1.Namespace{
 			ObjectMeta: metav1.ObjectMeta{
 				Name: userID,

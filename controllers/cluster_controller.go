@@ -32,6 +32,7 @@ type ClusterReconciler struct {
 }
 
 // +kubebuilder:rbac:groups=kubernetes.ov3rlord.me,resources=clusters,verbs=get;list;watch;create;update;patch;delete
+// +kubebuilder:rbac:groups="",resources=namespaces,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=kubernetes.ov3rlord.me,resources=clusters/status,verbs=get;update;patch
 
 func (r *ClusterReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {

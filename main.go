@@ -18,6 +18,7 @@ package main
 import (
 	"flag"
 	"os"
+	"time"
 
 	kubernetesv1 "github.com/gtracer/overlord/api/v1"
 	"github.com/gtracer/overlord/controllers"
@@ -51,10 +52,12 @@ func main() {
 
 	ctrl.SetLogger(zap.Logger(true))
 
+	syncPeriod := 30 * time.Second
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
 		Scheme:             scheme,
 		MetricsBindAddress: metricsAddr,
 		LeaderElection:     enableLeaderElection,
+		SyncPeriod:         &syncPeriod,
 	})
 	if err != nil {
 		setupLog.Error(err, "unable to start manager")

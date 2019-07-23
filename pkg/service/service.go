@@ -64,7 +64,7 @@ func CustomerRoutes() chi.Router {
 	r.Route("/{id}", func(r chi.Router) {
 		r.Get("/", clusterStatus)
 		r.Get("/kubeconfig", kubeconfig)
-		r.Route("/{nodeid}", func(r chi.Router) {
+		r.Route("/{minionid}", func(r chi.Router) {
 			r.Post("/", report)
 			r.Get("/", status)
 		})
@@ -84,7 +84,7 @@ func report(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	minionName := fmt.Sprintf("%s_%s", id, minionID)
+	minionName := fmt.Sprintf("%s-%s", id, minionID)
 	minionStatus, err := minion.Status(minionName, r)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("failed to get minion status %v", err), 400)
