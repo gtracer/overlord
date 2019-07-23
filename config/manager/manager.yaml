@@ -37,3 +37,49 @@ spec:
             cpu: 100m
             memory: 20Mi
       terminationGracePeriodSeconds: 10
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: server
+  namespace: system
+  labels:
+    control-plane: overlord
+spec:
+  selector:
+    matchLabels:
+      control-plane: overlord
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        control-plane: overlord
+    spec:
+      containers:
+      - command:
+        - /overlord
+        image: quay.io/awesomenix/overlord:latest
+        name: overlord
+        resources:
+          limits:
+            cpu: 100m
+            memory: 30Mi
+          requests:
+            cpu: 100m
+            memory: 20Mi
+      terminationGracePeriodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    control-plane: overlord
+  name: overlord-service
+  namespace: system
+spec:
+  ports:
+  - name: http
+    port: 8080
+    targetPort: http
+  selector:
+    control-plane: overlord
