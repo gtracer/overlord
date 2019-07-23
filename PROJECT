@@ -1,0 +1,10 @@
+version: "2"
+domain: ov3rlord.me
+repo: github.com/gtracer/overlord
+resources:
+- group: kubernetes
+  version: v1
+  kind: Cluster
+- group: kubernetes
+  version: v1
+  kind: Minion
