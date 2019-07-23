@@ -10,7 +10,9 @@ spec:
   names:
     kind: Minion
     plural: minions
-  scope: ""
+  scope: Cluster
+  subresources:
+    status: {}
   validation:
     openAPIV3Schema:
       description: Minion is the Schema for the minions API

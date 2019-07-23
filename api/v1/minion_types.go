@@ -28,7 +28,7 @@ type MinionStatus struct {
 }
 
 // +kubebuilder:object:root=true
-// +kubebuilder:resource:path=clusters,scope=Cluster
+// +kubebuilder:resource:path=minions,scope=Cluster
 // +kubebuilder:subresource:status
 
 // Minion is the Schema for the minions API
