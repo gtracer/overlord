@@ -1,7 +1,6 @@
 package service
 
 import (
-	"context"
 	"fmt"
 	"net/http"
 	"os"
@@ -11,10 +10,9 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	v1 "github.com/gtracer/overlord/api/v1"
-	"k8s.io/apimachinery/pkg/types"
+	"github.com/gtracer/overlord/pkg/cluster"
+	"github.com/gtracer/overlord/pkg/minion"
 	"k8s.io/client-go/kubernetes/scheme"
-	ctrlclient "sigs.k8s.io/controller-runtime/pkg/client"
-	ctrlcfg "sigs.k8s.io/controller-runtime/pkg/client/config"
 )
 
 // Run ...
@@ -80,33 +78,30 @@ func report(w http.ResponseWriter, r *http.Request) {
 	userID := chi.URLParam(r, "userid")
 	id := chi.URLParam(r, "id")
 	minionID := chi.URLParam(r, "minionid")
-	cfg, err := ctrlcfg.GetConfig()
+
+	if err := cluster.Report(userID, id); err != nil {
+		http.Error(w, fmt.Sprintf("failed to report cluster %v", err), 400)
+		return
+	}
+
+	minionName := fmt.Sprintf("%s_%s", id, minionID)
+	minionStatus, err := minion.Status(minionName, r)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("failed to get minion status %v", err), 400)
+		return
+	}
+
+	master, err := minion.Report(userID, id, minionName, minionStatus)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("failed to get config %v", err), 400)
 		return
 	}
 
-	client, err := ctrlclient.New(cfg, ctrlclient.Options{})
-	if err != nil {
-		http.Error(w, fmt.Sprintf("failed to get client %v", err), 400)
-		return
-	}
-
-	clusterName := fmt.Sprintf("%s_%s_%s", userID, id, minionID)
-	cluster := &v1.Cluster{}
-	err = client.Get(context.TODO(), types.NamespacedName{Name: clusterName}, cluster)
-	if err != nil {
-		http.Error(w, fmt.Sprintf("failed to get cluster %s, %v", clusterName, err), 400)
-		return
-	}
-
-	// r.ParseForm()
-	// query := r.Form.Get("query")
-	// http.Error(w, fmt.Sprintf("failed to get client %v", err), 400)
-	// w.Write(eventListJSON)
+	w.Write([]byte(master))
 }
 
 func status(w http.ResponseWriter, r *http.Request) {
+	http.Error(w, "unimplemented", 400)
 }
 
 // kubeconfig downloads kubeconfig

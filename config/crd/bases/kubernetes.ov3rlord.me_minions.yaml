@@ -10,7 +10,7 @@ spec:
   names:
     kind: Minion
     plural: minions
-  scope: Cluster
+  scope: ""
   subresources:
     status: {}
   validation:
@@ -400,9 +400,26 @@ spec:
           type: object
         spec:
           description: MinionSpec defines the desired state of Minion
+          properties:
+            master:
+              type: string
           type: object
         status:
           description: MinionStatus defines the observed state of Minion
+          properties:
+            nodeStatus:
+              description: NodeStatus as reported by each minion
+              properties:
+                kubeconfig:
+                  type: string
+                message:
+                  type: string
+                state:
+                  description: HealthState ...
+                  type: string
+                token:
+                  type: string
+              type: object
           type: object
       type: object
   versions:

@@ -25,10 +25,12 @@ type ClusterSpec struct {
 
 // ClusterStatus defines the observed state of Cluster
 type ClusterStatus struct {
+	Kubeconfig string `json:"kubeconfig,omitempty"`
+	Token      string `json:"token,omitempty"`
+	Master     string `json:"master,omitempty"`
 }
 
 // +kubebuilder:object:root=true
-// +kubebuilder:resource:path=clusters,scope=Cluster
 // +kubebuilder:subresource:status
 
 // Cluster is the Schema for the clusters API

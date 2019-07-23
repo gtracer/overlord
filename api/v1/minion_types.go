@@ -21,14 +21,15 @@ import (
 
 // MinionSpec defines the desired state of Minion
 type MinionSpec struct {
+	Master string `json:"master,omitempty"`
 }
 
 // MinionStatus defines the observed state of Minion
 type MinionStatus struct {
+	NodeStatus `json:"nodeStatus,omitempty"`
 }
 
 // +kubebuilder:object:root=true
-// +kubebuilder:resource:path=minions,scope=Cluster
 // +kubebuilder:subresource:status
 
 // Minion is the Schema for the minions API
@@ -51,4 +52,24 @@ type MinionList struct {
 
 func init() {
 	SchemeBuilder.Register(&Minion{}, &MinionList{})
+}
+
+// HealthState ...
+type HealthState string
+
+const (
+	// Healthy ...
+	Healthy HealthState = "Healthy"
+	// Warning ...
+	Warning HealthState = "Warning"
+	// Unhealthy ...
+	Unhealthy HealthState = "Unhealthy"
+)
+
+// NodeStatus as reported by each minion
+type NodeStatus struct {
+	Kubeconfig string      `json:"kubeconfig,omitempty"`
+	Token      string      `json:"token,omitempty"`
+	State      HealthState `json:"state,omitempty"`
+	Message    string      `json:"message,omitempty"`
 }

@@ -22,7 +22,7 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	kubernetesv1 "github.com/gtracer/overlord/api/v1"
+	v1 "github.com/gtracer/overlord/api/v1"
 )
 
 // ClusterReconciler reconciles a Cluster object
@@ -35,16 +35,64 @@ type ClusterReconciler struct {
 // +kubebuilder:rbac:groups=kubernetes.ov3rlord.me,resources=clusters/status,verbs=get;update;patch
 
 func (r *ClusterReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
-	_ = context.Background()
-	_ = r.Log.WithValues("cluster", req.NamespacedName)
+	ctx := context.Background()
+	log := r.Log.WithValues("cluster", req.NamespacedName)
 
-	// your logic here
+	cluster := &v1.Cluster{}
+
+	err := r.Get(ctx, req.NamespacedName, cluster)
+	if err != nil {
+		log.Error(err, "error get cluster")
+		return ctrl.Result{}, err
+	}
+
+	minionList := &v1.MinionList{}
+	matchingLabels := client.MatchingLabels(
+		map[string]string{
+			"kubernetes.ov3rlord.me/cluster": req.Name,
+		})
+	err = r.List(ctx, minionList, client.InNamespace(req.Namespace), matchingLabels)
+	if err != nil {
+		log.Error(err, "error listing minions")
+		return ctrl.Result{}, err
+	}
+
+	for _, minion := range minionList.Items {
+		if minion.Spec.Master != minion.Name {
+			continue
+		}
+		cluster.Status.Kubeconfig = minion.Status.Kubeconfig
+		cluster.Status.Token = minion.Status.Token
+		cluster.Status.Master = minion.Name
+	}
+
+	if cluster.Status.Master == "" &&
+		len(minionList.Items) > 0 {
+		cluster.Status.Master = minionList.Items[0].Name
+	}
+	err = r.Status().Update(ctx, cluster)
+	if err != nil {
+		log.Error(err, "error update cluster status")
+		return ctrl.Result{}, err
+	}
+
+	for _, minion := range minionList.Items {
+		if minion.Spec.Master == cluster.Status.Master {
+			continue
+		}
+		minion.Spec.Master = cluster.Status.Master
+		err = r.Update(ctx, &minion)
+		if err != nil {
+			log.Error(err, "error update cluster status")
+			return ctrl.Result{}, err
+		}
+	}
 
 	return ctrl.Result{}, nil
 }
 
 func (r *ClusterReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
-		For(&kubernetesv1.Cluster{}).
+		For(&v1.Cluster{}).
 		Complete(r)
 }

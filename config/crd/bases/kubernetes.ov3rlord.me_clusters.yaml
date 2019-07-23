@@ -10,7 +10,7 @@ spec:
   names:
     kind: Cluster
     plural: clusters
-  scope: Cluster
+  scope: ""
   subresources:
     status: {}
   validation:
@@ -403,6 +403,13 @@ spec:
           type: object
         status:
           description: ClusterStatus defines the observed state of Cluster
+          properties:
+            kubeconfig:
+              type: string
+            master:
+              type: string
+            token:
+              type: string
           type: object
       type: object
   versions:
