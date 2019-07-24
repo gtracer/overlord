@@ -3,6 +3,7 @@ package minion
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"time"
@@ -25,24 +26,25 @@ type minion struct {
 }
 
 // Status ...
-func Status(minionName string, r *http.Request) (*v1.NodeStatus, error) {
+func Status(id, minionID string, r *http.Request) (*v1.NodeStatus, error) {
 	//Read all the data in r.Body from a byte[], convert it to a string, and assign store it in 's'.
 	s, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		return nil, errors.Errorf("unable to read http body for %s, %v", minionName, err)
+		return nil, errors.Errorf("unable to read http body for %s/%s, %v", id, minionID, err)
 	}
 	jsonData := &v1.NodeStatus{}
 	// use the built in Unmarshal function
 	err = json.Unmarshal(s, jsonData)
 	if err != nil {
-		return nil, errors.Errorf("unable to unmarshal json body %s, %v", minionName, err)
+		return nil, errors.Errorf("unable to unmarshal json body %s/%s, %v", id, minionID, err)
 	}
 
 	return jsonData, nil
 }
 
 // Report ...
-func Report(userID, id, minionName string, minionStatus *v1.NodeStatus) ([]byte, error) {
+func Report(userID, id, minionID string, minionStatus *v1.NodeStatus) ([]byte, error) {
+	minionName := fmt.Sprintf("%s-%s", id, minionID)
 	client, err := client.New()
 	if err != nil {
 		return nil, errors.Errorf("failed to get client %v", err)
@@ -62,7 +64,9 @@ func Report(userID, id, minionName string, minionStatus *v1.NodeStatus) ([]byte,
 					"kubernetes.ov3rlord.me/cluster": id,
 				},
 			},
-			Spec: v1.MinionSpec{},
+			Spec: v1.MinionSpec{
+				Name: minionID,
+			},
 			Status: v1.MinionStatus{
 				NodeStatus: *minionStatus,
 			},
@@ -106,11 +110,11 @@ func List(userID, id string) ([]byte, error) {
 
 	for _, minionListItem := range minionList.Items {
 		role := "Agent"
-		if minionListItem.Spec.Master == minionListItem.Name {
+		if minionListItem.Spec.Master == minionListItem.Spec.Name {
 			role = "Master"
 		}
 		minionItem := minion{
-			Name:    minionListItem.Name,
+			Name:    minionListItem.Spec.Name,
 			Role:    role,
 			Status:  string(minionListItem.Status.State),
 			Message: minionListItem.Status.Message,

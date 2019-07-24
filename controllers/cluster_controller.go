@@ -67,17 +67,17 @@ func (r *ClusterReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	cluster.Status.Kubeconfig = ""
 	cluster.Status.Token = ""
 	for _, minion := range minionList.Items {
-		if minion.Spec.Master != minion.Name {
+		if minion.Spec.Master != minion.Spec.Name {
 			continue
 		}
 		cluster.Status.Kubeconfig = minion.Status.Kubeconfig
 		cluster.Status.Token = minion.Status.Token
-		cluster.Status.Master = minion.Name
+		cluster.Status.Master = minion.Spec.Name
 	}
 
 	if cluster.Status.Master == "" &&
 		len(minionList.Items) > 0 {
-		cluster.Status.Master = minionList.Items[0].Name
+		cluster.Status.Master = minionList.Items[0].Spec.Name
 	}
 	err = r.Status().Update(ctx, cluster)
 	if err != nil {

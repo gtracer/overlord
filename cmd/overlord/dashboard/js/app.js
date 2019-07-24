@@ -42,7 +42,8 @@ const Minons = {
     <div class="custom-margin">
     <div class="row">
         <div class="col col-lg-2"><h1>Minions</h1></div>
-        <div class="col"><button @click="fetchKubeconfig" type="button" class="btn btn-dark float-right mb-4"><i class="fa fa-download" aria-hidden="true"></i>  Kubeconfig</button></div>
+        <div class="col"><button type="button" onclick="window.open('http://51.143.57.200:8090')" class="btn btn-outline-dark float-right mb-2"><i class="fa fa-tachometer" aria-hidden="true"></i>  Dashboard</button></div>
+        <div class="col col-sm-2"><button @click="fetchKubeconfig" type="button" class="btn btn-outline-dark float-right mb-4"><i class="fa fa-download" aria-hidden="true"></i>  Kubeconfig</button></div>
     </div>
         <table class="table table-striped table-sm">
             <thead>
@@ -77,7 +78,7 @@ const Minons = {
             const url = window.URL.createObjectURL(new Blob([response]))
             const link = document.createElement('a')
             link.href = url
-            link.setAttribute('download', 'kube.config') //or any other extension
+            link.setAttribute('download', 'kube.conf') //or any other extension
             document.body.appendChild(link)
             link.click()
         },

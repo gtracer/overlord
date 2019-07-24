@@ -91,14 +91,13 @@ func report(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	minionName := fmt.Sprintf("%s-%s", id, minionID)
-	minionStatus, err := minion.Status(minionName, r)
+	minionStatus, err := minion.Status(id, minionID, r)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("failed to get minion status %v", err), 400)
 		return
 	}
 
-	jsonData, err := minion.Report(userID, id, minionName, minionStatus)
+	jsonData, err := minion.Report(userID, id, minionID, minionStatus)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("failed to get config %v", err), 400)
 		return

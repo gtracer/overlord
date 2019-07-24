@@ -19,7 +19,7 @@ const (
 	script     = "k3.sh"
 	kubeConfig = "/etc/rancher/k3s/k3s.yaml"
 	nodeToken  = "/var/lib/rancher/k3s/server/node-token"
-	endpoint   = "http://51.143.124.178:8080/customeroverlord/overlord/%s"
+	endpoint   = "http://51.143.124.178:8080/%s/%s/%s"
 )
 
 type Config struct {
@@ -30,7 +30,7 @@ type Config struct {
 	Message    string `json:"message,omitempty"`
 }
 
-func Boot() error {
+func Boot(customerName, clusterName string) error {
 	log.Println("Entering boot..")
 	err := fetchK3(script, url)
 	if err != nil {
@@ -39,7 +39,7 @@ func Boot() error {
 	}
 	config := &Config{}
 	for {
-		err = postStatus(config)
+		err = postStatus(customerName, clusterName, config)
 		time.Sleep(10 * time.Second)
 		if err != nil {
 			log.Printf("retrying post status, error: %v", err)
@@ -62,17 +62,16 @@ func getNodeName() (string, error) {
 		return "", err
 	}
 	node = strings.ReplaceAll(node, ".", "")
-	node = strings.ReplaceAll(node, "overlord-", "")
 	log.Printf("host name is: %s", node)
 	return node, nil
 }
 
-func postStatus(config *Config) error {
+func postStatus(customerName, clusterName string, config *Config) error {
 	nodeName, err := getNodeName()
 	if err != nil {
 		return err
 	}
-	endpointName := fmt.Sprintf(endpoint, nodeName)
+	endpointName := fmt.Sprintf(endpoint, customerName, clusterName, nodeName)
 	sKubeConfig, err := getFileContents(kubeConfig)
 	if err != nil {
 		log.Printf("unable to get kube config, error: %v", err)
@@ -144,14 +143,12 @@ func installK3(script string, config *Config) error {
 
 	log.Printf("installing k3...")
 	var install *exec.Cmd
-	nodeName, err := os.Hostname()
+	nodeName, err := getNodeName()
 	if err != nil {
 		log.Printf("unable to get hostname +%v", err)
 		return err
 	}
-	nodeName = strings.ReplaceAll(nodeName, ".", "")
 	var isMaster bool
-
 	if strings.EqualFold(config.Master, nodeName) {
 		isMaster = true
 	}

@@ -21,6 +21,7 @@ import (
 
 // MinionSpec defines the desired state of Minion
 type MinionSpec struct {
+	Name       string `json:"name,omitempty"`
 	Master     string `json:"master,omitempty"`
 	Kubeconfig string `json:"kubeconfig,omitempty"`
 	Token      string `json:"token,omitempty"`

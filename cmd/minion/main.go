@@ -1,13 +1,16 @@
 package main
 
 import (
+	"flag"
 	"log"
 
 	"github.com/gtracer/overlord/pkg/boot"
 )
 
 func main() {
-	err := boot.Boot()
+	customerName := flag.String("customer", "customer", "customer name")
+	clusterName := flag.String("cluster", "overlord", "cluster name")
+	err := boot.Boot(customerName, clusterName)
 	if err != nil {
 		log.Print("error occured")
 	}
