@@ -65,7 +65,7 @@ func CustomerRoutes() chi.Router {
 	r.Route("/{id}", func(r chi.Router) {
 		r.Get("/minions", listMinions)
 		r.Get("/kubeconfig", kubeconfig)
-		r.Post("/bootstrap", report)
+		r.Get("/bootstrap", report)
 		r.Post("/{minionid}", report)
 	})
 
@@ -141,4 +141,5 @@ func bootstrap(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, fmt.Sprintf("failed to report cluster %v", err), 400)
 		return
 	}
+	w.Write([]byte("ok"))
 }
