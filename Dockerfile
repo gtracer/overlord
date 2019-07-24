@@ -26,3 +26,4 @@ FROM gcr.io/distroless/static:latest
 WORKDIR /
 COPY --from=builder /workspace/manager .
 COPY --from=builder /workspace/overlord .
+COPY --from=builder /workspace/cmd/overlord/dashboard dashboard/

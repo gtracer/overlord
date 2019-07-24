@@ -14,3 +14,5 @@
 # Tmp files
 *tmp
 *k3.sh
+
+bin/

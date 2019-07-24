@@ -44,16 +44,16 @@ metadata:
   name: server
   namespace: system
   labels:
-    control-plane: overlord
+    app: overlord
 spec:
   selector:
     matchLabels:
-      control-plane: overlord
+      app: overlord
   replicas: 1
   template:
     metadata:
       labels:
-        control-plane: overlord
+        app: overlord
     spec:
       containers:
       - command:
@@ -77,8 +77,8 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
-    control-plane: overlord
-  name: overlord-service
+    app: overlord
+  name: service
   namespace: system
 spec:
   ports:
@@ -86,5 +86,51 @@ spec:
     port: 8080
     targetPort: overlord-server
   selector:
-    control-plane: overlord
+    app: overlord
+  type: LoadBalancer
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: inlets
+  labels:
+    app: inlets
+spec:
+  selector:
+    matchLabels:
+      app: inlets
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: inlets
+    spec:
+      containers:
+      - name: inlets
+        image: alexellis2/inlets:2.1.0
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8090
+          name: inlets-server
+          protocol: TCP
+        command: ["inlets"]
+        args:
+        - "server"
+        - "--port=8090"
+        - "--token=06536ae6eb87a72b9bef1d55d6bb0a7c9179c76a"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: inlets
+  name: inlets-service
+  namespace: system
+spec:
+  ports:
+  - name: http
+    port: 8090
+    targetPort: inlets-server
+  selector:
+    app: inlets
   type: LoadBalancer

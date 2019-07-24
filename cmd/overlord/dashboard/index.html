@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>OVERLORD</title>
+
+    <style>
+        .custom-font {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 24px;
+            letter-spacing: 1px;
+            padding-left: 26px;
+        }
+
+        .custom-margin {
+            padding-left: 48px;
+            padding-right: 48px;
+            padding-top: 6px;
+        }
+
+        .custom-breadcrumb {
+            padding-left: 33px;
+        }
+
+        .green {
+            font-size: 16px;
+            color: #219653;
+        }
+
+        .yellow {
+            font-size: 16px;
+            color: #F2C94C;
+        }
+
+        .red {
+            font-size: 16px;
+            color: #EB5757;
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css?family=Rajdhani:500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href="dist/css/font-awesome.min.css" rel="stylesheet">
+    <link href="dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
+        <ul class="navbar-nav">
+            <li class="nav-item active custom-font">
+                <a class="nav-link" href="#">OVERLORD</a>
+            </li>
+        </ul>
+    </nav>
+    <div class="container-fluid" id="app">
+        <div class="row">
+            <transition enter-active-class="animated fadeIn" leave-active-class="animated fadeOut" mode="out-in">
+                <main role="main" class="col-md-11 ml-sm-auto col-lg-11 px-4">
+                    <router-view></router-view>
+                </main>
+            </transition>
+        </div>
+    </div>
+    <script src="dist/js/vue.min.js"> </script>
+    <script src="dist/js/vue-resource.js"> </script>
+    <script src="dist/js/vue-router.js"> </script>
+    <script src="js/app.js"></script>
+</body>
+
+</html>

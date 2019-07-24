@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
+	"time"
 
 	"github.com/pkg/errors"
 
@@ -13,7 +14,15 @@ import (
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
+	ctrlclient "sigs.k8s.io/controller-runtime/pkg/client"
 )
+
+type minion struct {
+	Name    string `json:"name,omitempty"`
+	Role    string `json:"role,omitempty"`
+	Status  string `json:"status,omitempty"`
+	Message string `json:"message,omitempty"`
+}
 
 // Status ...
 func Status(minionName string, r *http.Request) (*v1.NodeStatus, error) {
@@ -33,17 +42,17 @@ func Status(minionName string, r *http.Request) (*v1.NodeStatus, error) {
 }
 
 // Report ...
-func Report(userID, id, minionName string, minionStatus *v1.NodeStatus) (string, error) {
+func Report(userID, id, minionName string, minionStatus *v1.NodeStatus) ([]byte, error) {
 	client, err := client.New()
 	if err != nil {
-		return "", errors.Errorf("failed to get client %v", err)
+		return nil, errors.Errorf("failed to get client %v", err)
 	}
 
 	minion := &v1.Minion{}
 	err = client.Get(context.TODO(), types.NamespacedName{Name: minionName, Namespace: userID}, minion)
 	if err != nil {
 		if !apierrors.IsNotFound(err) {
-			return "", errors.Errorf("failed to get minion %s, %v", minionName, err)
+			return nil, errors.Errorf("failed to get minion %s, %v", minionName, err)
 		}
 		minion = &v1.Minion{
 			ObjectMeta: metav1.ObjectMeta{
@@ -60,16 +69,54 @@ func Report(userID, id, minionName string, minionStatus *v1.NodeStatus) (string,
 		}
 		err = client.Create(context.TODO(), minion)
 		if err != nil {
-			return "", errors.Errorf("failed to create minion %s, %v", minionName, err)
+			return nil, errors.Errorf("failed to create minion %s, %v", minionName, err)
 		}
-		return "", nil
+		return nil, nil
 	}
 
 	minion.Status.NodeStatus = *minionStatus
+	minion.Status.LastTimestamp.Time = time.Now()
 	err = client.Status().Update(context.TODO(), minion)
 	if err != nil {
-		return "", errors.Errorf("failed to update minion status %s, %v", minionName, err)
+		return nil, errors.Errorf("failed to update minion status %s, %v", minionName, err)
 	}
 
-	return minion.Spec.Master, nil
+	return json.Marshal(minion.Spec)
+}
+
+// List ...
+func List(userID, id string) ([]byte, error) {
+	client, err := client.New()
+	if err != nil {
+		return nil, errors.Errorf("failed to get client %v", err)
+	}
+
+	matchingLabels := ctrlclient.MatchingLabels(
+		map[string]string{
+			"kubernetes.ov3rlord.me/cluster": id,
+		},
+	)
+
+	minionList := &v1.MinionList{}
+	err = client.List(context.TODO(), minionList, ctrlclient.InNamespace(userID), matchingLabels)
+	if err != nil {
+		return nil, errors.Errorf("failed to list minions %v", err)
+	}
+	var list []minion
+
+	for _, minionListItem := range minionList.Items {
+		role := "Agent"
+		if minionListItem.Spec.Master == minionListItem.Name {
+			role = "Master"
+		}
+		minionItem := minion{
+			Name:    minionListItem.Name,
+			Role:    role,
+			Status:  string(minionListItem.Status.State),
+			Message: minionListItem.Status.Message,
+		}
+		list = append(list, minionItem)
+	}
+
+	return json.Marshal(list)
 }

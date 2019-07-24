@@ -1,0 +1,27 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: inlets-client
+  labels:
+    app: inlets-client
+spec:
+  selector:
+    matchLabels:
+      app: inlets-client
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: inlets-client
+    spec:
+      containers:
+      - name: inlets
+        image: alexellis2/inlets:2.1.0-armhf
+        imagePullPolicy: Always
+        command: ["inlets"]
+        args:
+        - "client"
+        - "--remote=51.143.57.200:8090"
+        - "--upstream=https://kubernetes-dashboard.kube-system.svc.cluster.local:443"
+        - "--token=06536ae6eb87a72b9bef1d55d6bb0a7c9179c76a"

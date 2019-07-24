@@ -25,6 +25,13 @@ func Run() {
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 
+	workDir, _ := os.Getwd()
+	filesDir := filepath.Join(workDir, "dashboard")
+	FileServer(r, "/dashboard", http.Dir(filesDir))
+
+	r.Get("/", http.RedirectHandler("/dashboard", http.StatusMovedPermanently).ServeHTTP)
+	r.Get("/clusters", listClusters)
+
 	r.Mount("/{userid}", CustomerRoutes())
 
 	http.ListenAndServe(":8080", r)
@@ -55,22 +62,22 @@ func CustomerRoutes() chi.Router {
 	r := chi.NewRouter()
 	// r.Use() // some middleware..
 
-	workDir, _ := os.Getwd()
-	filesDir := filepath.Join(workDir, "dashboard")
-	FileServer(r, "/dashboard", http.Dir(filesDir))
-
-	r.Get("/", http.RedirectHandler("/dashboard", http.StatusMovedPermanently).ServeHTTP)
-
 	r.Route("/{id}", func(r chi.Router) {
-		r.Get("/", clusterStatus)
+		r.Get("/minions", listMinions)
 		r.Get("/kubeconfig", kubeconfig)
-		r.Route("/{minionid}", func(r chi.Router) {
-			r.Post("/", report)
-			r.Get("/", status)
-		})
+		r.Post("/{minionid}", report)
 	})
 
 	return r
+}
+
+func listClusters(w http.ResponseWriter, r *http.Request) {
+	jsonData, err := cluster.List()
+	if err != nil {
+		http.Error(w, fmt.Sprintf("failed to list clusters %v", err), 400)
+		return
+	}
+	w.Write(jsonData)
 }
 
 // report accepts current state from minions and responds with expected state
@@ -91,27 +98,36 @@ func report(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	master, err := minion.Report(userID, id, minionName, minionStatus)
+	jsonData, err := minion.Report(userID, id, minionName, minionStatus)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("failed to get config %v", err), 400)
 		return
 	}
 
-	w.Write([]byte(master))
+	w.Write(jsonData)
 }
 
-func clusterStatus(w http.ResponseWriter, r *http.Request) {
-	http.Error(w, "unimplemented", 400)
-}
+func listMinions(w http.ResponseWriter, r *http.Request) {
+	userID := chi.URLParam(r, "userid")
+	id := chi.URLParam(r, "id")
 
-func status(w http.ResponseWriter, r *http.Request) {
-	http.Error(w, "unimplemented", 400)
+	jsonData, err := minion.List(userID, id)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("failed to list minions %v", err), 400)
+		return
+	}
+	w.Write(jsonData)
 }
 
 // kubeconfig downloads kubeconfig
 func kubeconfig(w http.ResponseWriter, r *http.Request) {
-	// id := chi.URLParam(r, "id")
+	userID := chi.URLParam(r, "userid")
+	id := chi.URLParam(r, "id")
 
-	// http.Error(w, fmt.Sprintf("failed to get client %v", err), 400)
-	// w.Write(eventListJSON)
+	kubeconfig, err := cluster.Kubeconfig(userID, id)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("failed to get kubeconfig %v", err), 400)
+		return
+	}
+	w.Write(kubeconfig)
 }

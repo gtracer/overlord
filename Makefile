@@ -13,6 +13,9 @@ endif
 
 all: manager
 
+minion:
+	GOOS=linux GOARCH=arm GOARM=7 go build -o bin/minion ./cmd/minion/main.go
+
 # Run tests
 test: generate fmt vet manifests
 	go test ./api/... ./controllers/... -coverprofile cover.out
