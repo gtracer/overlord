@@ -58,7 +58,7 @@ const Minons = {
                 <tr v-for="minion in minions">
                     <td>{{ minion.name }}</td>
                     <td>{{ minion.role }}</td>
-                    <td><span v-bind:class="{'fa':true, 'fa-circle':true, 'green':(minion.status === 'Healthy', 'yellow':(minion.status === 'Warning', 'red':(minion.status === 'Unhealthy')}"></span>  {{ minion.status }}</td>
+                    <td><span v-bind:class="{'fa':true, 'fa-circle':true, 'green':(minion.status === 'Healthy'), 'yellow':(minion.status === 'Warning'), 'red':(minion.status === 'Unhealthy')}"></span>  {{ minion.status }}</td>
                     <td>{{ minion.message }}</td>
                 </tr>
             </tbody>

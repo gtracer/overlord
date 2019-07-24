@@ -113,6 +113,9 @@ func List(userID, id string) ([]byte, error) {
 		if minionListItem.Spec.Master == minionListItem.Spec.Name {
 			role = "Master"
 		}
+		if minionListItem.Spec.Master == "" {
+			role = "Unknown"
+		}
 		minionItem := minion{
 			Name:    minionListItem.Spec.Name,
 			Role:    role,
