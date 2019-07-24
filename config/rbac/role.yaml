@@ -9,30 +9,6 @@ rules:
 - apiGroups:
   - kubernetes.ov3rlord.me
   resources:
-  - clusters
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - ""
-  resources:
-  - namespaces
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - kubernetes.ov3rlord.me
-  resources:
   - clusters/status
   verbs:
   - get
@@ -58,3 +34,27 @@ rules:
   - get
   - patch
   - update
+- apiGroups:
+  - kubernetes.ov3rlord.me
+  resources:
+  - clusters
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - namespaces
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
