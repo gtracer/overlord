@@ -34,15 +34,7 @@ func Bootstrap(userID, clusterName string) error {
 		return errors.Errorf("failed to get cluster %s, %v", nsName.Name, err)
 	}
 
-	cluster = &v1.Cluster{
-		ObjectMeta: metav1.ObjectMeta{
-			Namespace: nsName.Namespace,
-			Name:      nsName.Name,
-		},
-		Spec: v1.ClusterSpec{
-			Bootstrap: true,
-		},
-	}
+	cluster.Spec.Bootstrap = true
 	err = client.Update(context.TODO(), cluster)
 	if err != nil {
 		return err
