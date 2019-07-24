@@ -61,15 +61,25 @@ func CustomerRoutes() chi.Router {
 
 	r.Get("/", http.RedirectHandler("/dashboard", http.StatusMovedPermanently).ServeHTTP)
 
+	r.Get("/clusters", listClusters)
 	r.Route("/{id}", func(r chi.Router) {
-		r.Get("/", listMinions)
+		r.Get("/minions", listMinions)
 		r.Get("/kubeconfig", kubeconfig)
-		r.Route("/{minionid}", func(r chi.Router) {
-			r.Post("/", report)
-		})
+		r.Post("/{minionid}", report)
 	})
 
 	return r
+}
+
+func listClusters(w http.ResponseWriter, r *http.Request) {
+	userID := chi.URLParam(r, "userid")
+
+	jsonData, err := cluster.List(userID)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("failed to list clusters %v", err), 400)
+		return
+	}
+	w.Write(jsonData)
 }
 
 // report accepts current state from minions and responds with expected state
@@ -116,7 +126,7 @@ func kubeconfig(w http.ResponseWriter, r *http.Request) {
 	userID := chi.URLParam(r, "userid")
 	id := chi.URLParam(r, "id")
 
-	kubeconfig, err := cluster.Kubeconfig(userId, id)
+	kubeconfig, err := cluster.Kubeconfig(userID, id)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("failed to get kubeconfig %v", err), 400)
 		return
