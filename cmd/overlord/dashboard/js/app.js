@@ -11,7 +11,7 @@ const Clusters = {
         <tbody>
             <tr v-for="cluster in clusters">
                 <td>
-                    <router-link class="nav-link" :to="{ path: '/'+cluster+'/overlordminions'}">{{cluster}}</router - link >
+                    <router-link class="nav-link" :to="{ name: 'overlordminions', params:{cluster: cluster}}">{{cluster}}</router-link>
                 </td >
             </tr >
         </tbody >
@@ -39,9 +39,11 @@ const Clusters = {
 
 const Minons = {
     template: `< div >
-    <h1>Minions</h1>
-    <button onclick= type="button" class="btn btn-primary float-right mb-4">Download Kubeconfig</button>
-    <div class="table-responsive">
+    <div class="custom-margin">
+    <div class="row">
+        <div class="col col-lg-2"><h1>Minions</h1></div>
+        <div class="col"><button @click="fetchKubeconfig" type="button" class="btn btn-dark float-right mb-4"><i class="fa fa-download" aria-hidden="true"></i>  Kubeconfig</button></div>
+    </div>
         <table class="table table-striped table-sm">
             <thead>
                 <tr>
@@ -71,9 +73,24 @@ const Minons = {
         setInterval(this.fetchMinions, 10000)
     },
     methods: {
+        forceFileDownload(response) {
+            const url = window.URL.createObjectURL(new Blob([response]))
+            const link = document.createElement('a')
+            link.href = url
+            link.setAttribute('download', 'kube.config') //or any other extension
+            document.body.appendChild(link)
+            link.click()
+        },
         fetchMinions: function () {
-            this.$http.get(this.$route.params.cluster + "/minions").then(result => {
+            this.$http.get("/" + this.$route.params.cluster + "/minions").then(result => {
                 this.minions = result.body;
+            }, error => {
+                console.error(error);
+            });
+        },
+        fetchKubeconfig: function (event) {
+            this.$http.get("/" + this.$route.params.cluster + "/kubeconfig").then(result => {
+                this.forceFileDownload(result.body)
             }, error => {
                 console.error(error);
             });
@@ -84,7 +101,7 @@ const Minons = {
 const routes = [
     { path: '/', component: Clusters },
     { path: '/overlordclusters', component: Clusters },
-    { path: '/:cluster/overlordminions', component: Minons },
+    { path: '/:cluster/overlordminions', name: 'overlordminions', component: Minons },
 ]
 
 const router = new VueRouter({
