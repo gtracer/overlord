@@ -134,6 +134,10 @@ func fetchK3(filename, url string) error {
 }
 
 func installK3(script string, config *Config) error {
+	if config.Master == "" {
+		log.Printf("empty master name skipping installation")
+		return nil
+	}
 	permission := exec.Command("chmod", "+x", script)
 	err := permission.Run()
 	if err != nil {
