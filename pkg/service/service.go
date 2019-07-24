@@ -65,7 +65,7 @@ func CustomerRoutes() chi.Router {
 	r.Route("/{id}", func(r chi.Router) {
 		r.Get("/minions", listMinions)
 		r.Get("/kubeconfig", kubeconfig)
-		r.Get("/bootstrap", report)
+		r.Post("/bootstrap", bootstrap)
 		r.Post("/{minionid}", report)
 	})
 
