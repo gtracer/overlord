@@ -26,7 +26,8 @@ type MinionSpec struct {
 
 // MinionStatus defines the observed state of Minion
 type MinionStatus struct {
-	NodeStatus `json:"nodeStatus,omitempty"`
+	NodeStatus    `json:"nodeStatus,omitempty"`
+	LastTimestamp metav1.Time `json:"lastTimestamp,omitempty"`
 }
 
 // +kubebuilder:object:root=true

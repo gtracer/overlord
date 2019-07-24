@@ -17,12 +17,14 @@ package controllers
 
 import (
 	"context"
+	"fmt"
+	"time"
 
 	"github.com/go-logr/logr"
+	v1 "github.com/gtracer/overlord/api/v1"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-
-	kubernetesv1 "github.com/gtracer/overlord/api/v1"
 )
 
 // MinionReconciler reconciles a Minion object
@@ -35,16 +37,35 @@ type MinionReconciler struct {
 // +kubebuilder:rbac:groups=kubernetes.ov3rlord.me,resources=minions/status,verbs=get;update;patch
 
 func (r *MinionReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
-	_ = context.Background()
-	_ = r.Log.WithValues("minion", req.NamespacedName)
+	ctx := context.Background()
+	log := r.Log.WithValues("minion", req.NamespacedName)
 
-	// your logic here
+	minion := &v1.Minion{}
+	err := r.Get(ctx, req.NamespacedName, minion)
+	if err != nil {
+		if apierrors.IsNotFound(err) {
+			return ctrl.Result{}, nil
+		}
+		log.Error(err, "failed to get minion")
+		return ctrl.Result{}, err
+	}
+
+	if time.Since(minion.Status.LastTimestamp.Time).Seconds() > 120 {
+		minion.Status.NodeStatus.State = v1.Unhealthy
+		minion.Status.NodeStatus.Message =
+			fmt.Sprintf("no healthy report since %s", minion.Status.LastTimestamp.Time.String())
+		err = r.Status().Update(ctx, minion)
+		if err != nil {
+			log.Error(err, "failed to update minion status")
+			return ctrl.Result{}, err
+		}
+	}
 
 	return ctrl.Result{}, nil
 }
 
 func (r *MinionReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
-		For(&kubernetesv1.Minion{}).
+		For(&v1.Minion{}).
 		Complete(r)
 }

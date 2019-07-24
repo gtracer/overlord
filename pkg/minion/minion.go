@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
+	"time"
 
 	"github.com/pkg/errors"
 
@@ -66,6 +67,7 @@ func Report(userID, id, minionName string, minionStatus *v1.NodeStatus) (string,
 	}
 
 	minion.Status.NodeStatus = *minionStatus
+	minion.Status.LastTimestamp.Time = time.Now()
 	err = client.Status().Update(context.TODO(), minion)
 	if err != nil {
 		return "", errors.Errorf("failed to update minion status %s, %v", minionName, err)

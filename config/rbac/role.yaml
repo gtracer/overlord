@@ -9,14 +9,6 @@ rules:
 - apiGroups:
   - kubernetes.ov3rlord.me
   resources:
-  - minions/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - kubernetes.ov3rlord.me
-  resources:
   - clusters
   verbs:
   - create
@@ -58,3 +50,11 @@ rules:
   - patch
   - update
   - watch
+- apiGroups:
+  - kubernetes.ov3rlord.me
+  resources:
+  - minions/status
+  verbs:
+  - get
+  - patch
+  - update

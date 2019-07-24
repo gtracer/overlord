@@ -58,6 +58,9 @@ func (r *ClusterReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		return ctrl.Result{}, err
 	}
 
+	cluster.Status.Master = ""
+	cluster.Status.Kubeconfig = ""
+	cluster.Status.Token = ""
 	for _, minion := range minionList.Items {
 		if minion.Spec.Master != minion.Name {
 			continue
