@@ -16,6 +16,41 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 )
 
+// Bootstrap ...
+func Bootstrap(userID, clusterName string) error {
+	client, err := client.New()
+	if err != nil {
+		return errors.Errorf("failed to get client %v", err)
+	}
+
+	nsName := types.NamespacedName{
+		Namespace: userID,
+		Name:      clusterName,
+	}
+
+	cluster := &v1.Cluster{}
+	err = client.Get(context.TODO(), nsName, cluster)
+	if err != nil {
+		return errors.Errorf("failed to get cluster %s, %v", nsName.Name, err)
+	}
+
+	cluster = &v1.Cluster{
+		ObjectMeta: metav1.ObjectMeta{
+			Namespace: nsName.Namespace,
+			Name:      nsName.Name,
+		},
+		Spec: v1.ClusterSpec{
+			Bootstrap: true,
+		},
+	}
+	err = client.Update(context.TODO(), cluster)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // Report ...
 func Report(userID, clusterName string) error {
 	client, err := client.New()

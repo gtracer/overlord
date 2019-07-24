@@ -65,6 +65,7 @@ func CustomerRoutes() chi.Router {
 	r.Route("/{id}", func(r chi.Router) {
 		r.Get("/minions", listMinions)
 		r.Get("/kubeconfig", kubeconfig)
+		r.Post("/bootstrap", report)
 		r.Post("/{minionid}", report)
 	})
 
@@ -129,4 +130,15 @@ func kubeconfig(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.Write(kubeconfig)
+}
+
+// bootstrap enables bootstrap on cluster
+func bootstrap(w http.ResponseWriter, r *http.Request) {
+	userID := chi.URLParam(r, "userid")
+	id := chi.URLParam(r, "id")
+
+	if err := cluster.Bootstrap(userID, id); err != nil {
+		http.Error(w, fmt.Sprintf("failed to report cluster %v", err), 400)
+		return
+	}
 }
