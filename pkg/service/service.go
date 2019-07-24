@@ -62,11 +62,10 @@ func CustomerRoutes() chi.Router {
 	r.Get("/", http.RedirectHandler("/dashboard", http.StatusMovedPermanently).ServeHTTP)
 
 	r.Route("/{id}", func(r chi.Router) {
-		r.Get("/", clusterStatus)
+		r.Get("/", listMinions)
 		r.Get("/kubeconfig", kubeconfig)
 		r.Route("/{minionid}", func(r chi.Router) {
 			r.Post("/", report)
-			r.Get("/", status)
 		})
 	})
 
@@ -91,27 +90,36 @@ func report(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	master, err := minion.Report(userID, id, minionName, minionStatus)
+	jsonData, err := minion.Report(userID, id, minionName, minionStatus)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("failed to get config %v", err), 400)
 		return
 	}
 
-	w.Write([]byte(master))
+	w.Write(jsonData)
 }
 
-func clusterStatus(w http.ResponseWriter, r *http.Request) {
-	http.Error(w, "unimplemented", 400)
-}
+func listMinions(w http.ResponseWriter, r *http.Request) {
+	userID := chi.URLParam(r, "userid")
+	id := chi.URLParam(r, "id")
 
-func status(w http.ResponseWriter, r *http.Request) {
-	http.Error(w, "unimplemented", 400)
+	jsonData, err := minion.List(userID, id)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("failed to list minions %v", err), 400)
+		return
+	}
+	w.Write(jsonData)
 }
 
 // kubeconfig downloads kubeconfig
 func kubeconfig(w http.ResponseWriter, r *http.Request) {
-	// id := chi.URLParam(r, "id")
+	userID := chi.URLParam(r, "userid")
+	id := chi.URLParam(r, "id")
 
-	// http.Error(w, fmt.Sprintf("failed to get client %v", err), 400)
-	// w.Write(eventListJSON)
+	kubeconfig, err := cluster.Kubeconfig(userId, id)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("failed to get kubeconfig %v", err), 400)
+		return
+	}
+	w.Write(kubeconfig)
 }

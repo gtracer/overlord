@@ -2,6 +2,7 @@ package cluster
 
 import (
 	"context"
+	"strings"
 
 	"github.com/pkg/errors"
 
@@ -60,4 +61,25 @@ func Report(userID, clusterName string) error {
 	}
 
 	return nil
+}
+
+// Kubeconfig ...
+func Kubeconfig(userID, clusterName string) ([]byte, error) {
+	client, err := client.New()
+	if err != nil {
+		return nil, errors.Errorf("failed to get client %v", err)
+	}
+
+	nsName := types.NamespacedName{
+		Namespace: userID,
+		Name:      clusterName,
+	}
+	cluster := &v1.Cluster{}
+	err = client.Get(context.TODO(), nsName, cluster)
+	if err != nil {
+		return nil, errors.Errorf("failed to get kubeconfig %v", err)
+	}
+
+	kubeconfig := strings.Replace(cluster.Status.Kubeconfig, "localhost", cluster.Status.Master, -1)
+	return []byte(kubeconfig), nil
 }

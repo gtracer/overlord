@@ -81,10 +81,14 @@ func (r *ClusterReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	}
 
 	for _, minion := range minionList.Items {
-		if minion.Spec.Master == cluster.Status.Master {
+		if minion.Spec.Master == cluster.Status.Master &&
+			minion.Spec.Kubeconfig == cluster.Status.Kubeconfig &&
+			minion.Spec.Token == cluster.Status.Token {
 			continue
 		}
 		minion.Spec.Master = cluster.Status.Master
+		minion.Spec.Kubeconfig = cluster.Status.Kubeconfig
+		minion.Spec.Token = cluster.Status.Token
 		err = r.Update(ctx, &minion)
 		if err != nil {
 			log.Error(err, "error update cluster status")
