@@ -3,6 +3,7 @@ package cluster
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -13,7 +14,6 @@ import (
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
-	ctrlclient "sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 // Report ...
@@ -66,21 +66,21 @@ func Report(userID, clusterName string) error {
 }
 
 // List ...
-func List(userID string) ([]byte, error) {
+func List() ([]byte, error) {
 	client, err := client.New()
 	if err != nil {
 		return nil, errors.Errorf("failed to get client %v", err)
 	}
 
 	clusterList := &v1.ClusterList{}
-	err = client.List(context.TODO(), clusterList, ctrlclient.InNamespace(userID))
+	err = client.List(context.TODO(), clusterList)
 	if err != nil {
 		return nil, errors.Errorf("failed to list clusters %v", err)
 	}
 	var list []string
 
 	for _, cluster := range clusterList.Items {
-		list = append(list, cluster.Name)
+		list = append(list, fmt.Sprintf("%s/%s", cluster.Namespace, cluster.Name))
 	}
 
 	return json.Marshal(list)

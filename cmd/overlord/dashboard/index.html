@@ -54,17 +54,6 @@
     </nav>
     <div class="container-fluid" id="app">
         <div class="row">
-            <nav class="col-md-1 d-none d-md-block bg-light sidebar">
-                <div class="sidebar-sticky">
-                    <ul class="nav flex-column">
-                        <li class="nav-item">
-                            <router-link class="nav-link" to="/clusters">Clusters</router-link>
-                            <router-link class="nav-link" to="/minions">Minions</router-link>
-                        </li>
-                    </ul>
-                </div>
-            </nav>
-
             <transition enter-active-class="animated fadeIn" leave-active-class="animated fadeOut" mode="out-in">
                 <main role="main" class="col-md-11 ml-sm-auto col-lg-11 px-4">
                     <router-view></router-view>

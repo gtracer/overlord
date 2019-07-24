@@ -401,7 +401,11 @@ spec:
         spec:
           description: MinionSpec defines the desired state of Minion
           properties:
+            kubeconfig:
+              type: string
             master:
+              type: string
+            token:
               type: string
           type: object
         status:

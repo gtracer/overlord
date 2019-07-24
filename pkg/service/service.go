@@ -25,6 +25,13 @@ func Run() {
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 
+	workDir, _ := os.Getwd()
+	filesDir := filepath.Join(workDir, "dashboard")
+	FileServer(r, "/dashboard", http.Dir(filesDir))
+
+	r.Get("/", http.RedirectHandler("/dashboard", http.StatusMovedPermanently).ServeHTTP)
+	r.Get("/clusters", listClusters)
+
 	r.Mount("/{userid}", CustomerRoutes())
 
 	http.ListenAndServe(":8080", r)
@@ -55,13 +62,6 @@ func CustomerRoutes() chi.Router {
 	r := chi.NewRouter()
 	// r.Use() // some middleware..
 
-	workDir, _ := os.Getwd()
-	filesDir := filepath.Join(workDir, "dashboard")
-	FileServer(r, "/dashboard", http.Dir(filesDir))
-
-	r.Get("/", http.RedirectHandler("/dashboard", http.StatusMovedPermanently).ServeHTTP)
-
-	r.Get("/clusters", listClusters)
 	r.Route("/{id}", func(r chi.Router) {
 		r.Get("/minions", listMinions)
 		r.Get("/kubeconfig", kubeconfig)
@@ -72,9 +72,7 @@ func CustomerRoutes() chi.Router {
 }
 
 func listClusters(w http.ResponseWriter, r *http.Request) {
-	userID := chi.URLParam(r, "userid")
-
-	jsonData, err := cluster.List(userID)
+	jsonData, err := cluster.List()
 	if err != nil {
 		http.Error(w, fmt.Sprintf("failed to list clusters %v", err), 400)
 		return

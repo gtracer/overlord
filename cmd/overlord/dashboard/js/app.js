@@ -10,11 +10,13 @@ const Clusters = {
         </thead>
         <tbody>
             <tr v-for="cluster in clusters">
-                <td>{{cluster}}</td>
-            </tr>
-        </tbody>
-    </table>
-</div></div>`,
+                <td>
+                    <router-link class="nav-link" :to="{ path: '/'+cluster+'/overlordminions'}">{{cluster}}</router - link >
+                </td >
+            </tr >
+        </tbody >
+    </table >
+</div ></div > `,
     data: function () {
         return {
             clusters: {},
@@ -26,7 +28,7 @@ const Clusters = {
     },
     methods: {
         fetchClusters: function () {
-            this.$http.get(this.$route.params.userid + "/clusters").then(result => {
+            this.$http.get("/clusters").then(result => {
                 this.clusters = result.body;
             }, error => {
                 console.error(error);
@@ -36,32 +38,32 @@ const Clusters = {
 }
 
 const Minons = {
-    template: `<div>
-<h1>Machine Pools</h1>
-<button onclick= type="button" class="btn btn-primary float-right mb-4">Download Kubeconfig</button>
-<div class="table-responsive">
-    <table class="table table-striped table-sm">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Role</th>
-                <th>Status</th>
-                <th>Message</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr v-for="minion in minions">
-                <td>{{minion.name}}</td>
-                <td>{{minion.role}}</td>
-                <td>{{minion.status}}</td>
-                <td>{{minion.message}}</td>
-            </tr>
-        </tbody>
-    </table>
-</div></div>`,
+    template: `< div >
+    <h1>Minions</h1>
+    <button onclick= type="button" class="btn btn-primary float-right mb-4">Download Kubeconfig</button>
+    <div class="table-responsive">
+        <table class="table table-striped table-sm">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Role</th>
+                    <th>Status</th>
+                    <th>Message</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="minion in minions">
+                    <td>{{ minion.name }}</td>
+                    <td>{{ minion.role }}</td>
+                    <td>{{ minion.status }}</td>
+                    <td>{{ minion.message }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div></div > `,
     data: function () {
         return {
-            machinepools: {},
+            minions: {},
         }
     },
     created: function () {
@@ -70,7 +72,7 @@ const Minons = {
     },
     methods: {
         fetchMinions: function () {
-            this.$http.get(this.$route.params.userid + "/" + this.$route.params.id + "/minions").then(result => {
+            this.$http.get(this.$route.params.cluster + "/minions").then(result => {
                 this.minions = result.body;
             }, error => {
                 console.error(error);
@@ -81,8 +83,8 @@ const Minons = {
 
 const routes = [
     { path: '/', component: Clusters },
-    { path: '/:userid/clusters', component: Clusters },
-    { path: '/userid/:id/minions', component: Minons },
+    { path: '/overlordclusters', component: Clusters },
+    { path: '/:cluster/overlordminions', component: Minons },
 ]
 
 const router = new VueRouter({
