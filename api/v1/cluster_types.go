@@ -21,6 +21,7 @@ import (
 
 // ClusterSpec defines the desired state of Cluster
 type ClusterSpec struct {
+	Bootstrap bool `json:"bootstrap,omitempty"`
 }
 
 // ClusterStatus defines the observed state of Cluster

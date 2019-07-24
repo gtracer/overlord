@@ -47,6 +47,11 @@ func (r *ClusterReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		return ctrl.Result{}, err
 	}
 
+	if !cluster.Spec.Bootstrap {
+		log.Info("Cluster isnt allowing bootstrap, try again later")
+		return ctrl.Result{}, nil
+	}
+
 	minionList := &v1.MinionList{}
 	matchingLabels := client.MatchingLabels(
 		map[string]string{
