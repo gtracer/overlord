@@ -405,6 +405,8 @@ spec:
               type: string
             master:
               type: string
+            name:
+              type: string
             token:
               type: string
           type: object

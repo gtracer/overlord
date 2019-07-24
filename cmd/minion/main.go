@@ -10,7 +10,7 @@ import (
 func main() {
 	customerName := flag.String("customer", "customer", "customer name")
 	clusterName := flag.String("cluster", "overlord", "cluster name")
-	err := boot.Boot(customerName, clusterName)
+	err := boot.Boot(*customerName, *clusterName)
 	if err != nil {
 		log.Print("error occured")
 	}
