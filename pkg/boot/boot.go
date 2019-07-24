@@ -52,7 +52,6 @@ func Boot() error {
 			continue
 		}
 	}
-	return nil
 }
 
 func getNodeName() (string, error) {
