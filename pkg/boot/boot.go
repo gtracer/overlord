@@ -87,7 +87,7 @@ func postStatus(config *Config) error {
 		log.Printf("unable to get kube config, error: %v", err)
 		return err
 	}
-	config.Token = sToken
+	config.Token = strings.TrimSpace(sToken)
 	log.Printf("token contains: %s", sToken)
 
 	body, err := json.Marshal(config)
@@ -165,13 +165,14 @@ func installK3(script string, config *Config) error {
 		install = exec.Command("./"+script, args...)
 	} else {
 		log.Print("bootstrapping agent")
-		url := fmt.Sprintf("http://%s:6443", config.Master)
+		token := strings.TrimSpace(config.Token)
+		url := fmt.Sprintf("https://%s:6443", config.Master)
 		args := []string{
-			"--token=" + config.Token,
+			"--token=" + token,
 			"--server=" + url,
 		}
 		install = exec.Command("./"+script, args...)
-		install.Env = append(install.Env, "K3S_TOKEN="+config.Token)
+		install.Env = append(install.Env, "K3S_TOKEN="+token)
 		install.Env = append(install.Env, "K3S_URL="+url)
 	}
 	err = install.Run()
