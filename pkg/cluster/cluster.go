@@ -82,6 +82,9 @@ func Report(userID, clusterName string) error {
 				Namespace: nsName.Namespace,
 				Name:      nsName.Name,
 			},
+			Spec: v1.ClusterSpec{
+				Bootstrap: true,
+			},
 		}
 		err = client.Create(context.TODO(), cluster)
 		if err != nil {
