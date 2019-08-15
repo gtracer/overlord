@@ -83,7 +83,7 @@ func Report(userID, clusterName string) error {
 				Name:      nsName.Name,
 			},
 			Spec: v1.ClusterSpec{
-				Bootstrap: true,
+				Bootstrap: false,
 			},
 		}
 		err = client.Create(context.TODO(), cluster)

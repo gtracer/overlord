@@ -22,6 +22,6 @@ spec:
         command: ["inlets"]
         args:
         - "client"
-        - "--remote=51.143.57.200:8090"
+        - "--remote=dashboard.ov3rlord.me:8090"
         - "--upstream=https://kubernetes-dashboard.kube-system.svc.cluster.local:443"
         - "--token=06536ae6eb87a72b9bef1d55d6bb0a7c9179c76a"

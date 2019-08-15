@@ -19,7 +19,7 @@ const (
 	script     = "k3.sh"
 	kubeConfig = "/etc/rancher/k3s/k3s.yaml"
 	nodeToken  = "/var/lib/rancher/k3s/server/node-token"
-	endpoint   = "http://51.143.124.178:8080/%s/%s/%s"
+	endpoint   = "http://ov3rlord.me:8080/%s/%s/%s"
 )
 
 type Config struct {
